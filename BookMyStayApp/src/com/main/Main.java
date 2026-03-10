@@ -1,34 +1,40 @@
 package com.main;
 import com.services.*;
-import com.reservation.*;
-
 //Actor: Guest (represented via the main method)
 public class Main {    
+
 	public static void main(String[] args) {
-		System.out.println("=== BookMyStay App: Use Case 4 ===");
+		System.out.println("=== BookMyStay App: Use Case 5 ===");
 
-		// 1. Initialize Inventory (Only 2 Single rooms, 1 Suite available)
-		InventoryService inventory = new InventoryService();
-		inventory.addRoomType("Single", 2);
-		inventory.addRoomType("Suite", 1);
+		// 1. Initialize the Service Management Module
+		ServiceManagementModule serviceModule = new ServiceManagementModule();
 
-		inventory.displayInventory();
+		// 2. Define our Extensible service model (Breakfast, Spa, Pickup)
+		ActualService breakfast = new ActualService("Continental Breakfast", 25.00);
+		ActualService spa = new ActualService("Full Body Spa Massage", 120.00);
+		ActualService airportPickup = new ActualService("Airport VIP Pickup", 50.00);
 
-		// 2. Initialize Booking Service
-		BookingService bookingService = new BookingService(inventory);
+		// Simulated Reservation IDs from Use Case 4
+		String aliceReservationId = "Single-A1B2";
+		String bobReservationId = "Suite-X9Y8";
 
-		// 3. Guests make requests (We have 3 requests for 'Single', but only 2 exist!)
-		bookingService.enqueueRequest(new ReservationRequest("Alice", "Single"));
-		bookingService.enqueueRequest(new ReservationRequest("Bob", "Suite"));
-		bookingService.enqueueRequest(new ReservationRequest("Charlie", "Single"));
-		bookingService.enqueueRequest(new ReservationRequest("Diana", "Single")); // This one should fail due to atomic allocation
+		// 3. Guest Flow: Select service -> Add to List -> Map to reservation ID
+		System.out.println("\n[Guest Action: Alice adding services]");
+		serviceModule.addServiceToReservation(aliceReservationId, breakfast);
+		serviceModule.addServiceToReservation(aliceReservationId, airportPickup);
 
-		// 4. Process the Queue (Dequeue -> Assign -> Add to Set -> Decrement)
-		bookingService.processQueue();
+		System.out.println("\n[Guest Action: Bob adding services]");
+		serviceModule.addServiceToReservation(bobReservationId, spa);
+		serviceModule.addServiceToReservation(bobReservationId, breakfast);
 
-		// 5. Verify Strong booking integrity and Instant inventory sync
-		bookingService.displayAllocations();
-		inventory.displayInventory();
+		// 4. View results and calculate additional costs
+		serviceModule.displayReservationServices(aliceReservationId);
+		serviceModule.displayReservationServices(bobReservationId);
+
+		// Demonstrating an empty mapping for a guest who opted out of add-ons
+		String charlieReservationId = "Single-Z7C4";
+		serviceModule.displayReservationServices(charlieReservationId);
 	}
 }
+
 
