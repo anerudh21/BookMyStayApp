@@ -2,7 +2,7 @@ package com.services;
 
 import java.util.Map;
 
-public // Actor: Search Service [cite: 72]
+public // Actor: Search Service
 class SearchService {
     private InventoryService inventory;
 
@@ -10,7 +10,7 @@ class SearchService {
         this.inventory = inventory;
     }
 
-    // Flow: Search request -> HashMap lookup -> Filter available rooms -> Display [cite: 74]
+    // Flow: Search request -> HashMap lookup -> Filter available rooms -> Display 
     public void displayAvailableRooms() {
         System.out.println("\n--- Available Rooms & Amenities ---");
         Map<String, Integer> counts = inventory.getRoomCounts();
