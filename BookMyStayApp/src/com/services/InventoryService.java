@@ -4,34 +4,31 @@ import java.util.Map;
 
 // Core Data Source (from UC1, extended for amenities)
 public class InventoryService {
-	private Map<String, Integer> roomCounts;
+    private Map<String, Integer> roomCounts = new HashMap<>();
+    private Map<String, Double> roomPrices = new HashMap<>();
 
-	public InventoryService() {
-		this.roomCounts = new HashMap<>();
-	}
+    public void addRoomType(String type, int initialCount, double price) {
+        roomCounts.put(type, initialCount);
+        roomPrices.put(type, price);
+        System.out.println("Inventory Updated: Added " + initialCount + " '" + type + "' room(s) at $" + price);
+    }
 
-	public void addRoomType(String type, int initialCount) {
-		roomCounts.put(type, initialCount);
-	}
+    public int getAvailableCount(String type) {
+        return roomCounts.getOrDefault(type, 0);
+    }
 
-	public int getAvailableCount(String type) {
-		return roomCounts.getOrDefault(type, 0);
-	}
+    public void decrementInventory(String type) {
+        int currentCount = getAvailableCount(type);
+        if (currentCount > 0) {
+            roomCounts.put(type, currentCount - 1);
+        }
+    }
 
-	// Key Requirement: Update availability immediately
-	public void decrementInventory(String type) {
-		int currentCount = getAvailableCount(type);
-		if (currentCount > 0) {
-			roomCounts.put(type, currentCount - 1);
-		}
-	}
-
-	public void displayInventory() {
-		System.out.println("\n--- Real-Time Inventory Status ---");
-		for (Map.Entry<String, Integer> entry : roomCounts.entrySet()) {
-			System.out.printf("Type: %-8s | Available: %-2d%n", entry.getKey(), entry.getValue());
-		}
-		System.out.println("----------------------------------");
-	}
-	
+    public Map<String, Integer> getRoomCounts() {
+        return new HashMap<>(roomCounts);
+    }
+    
+    public double getPrice(String type) {
+        return roomPrices.getOrDefault(type, 0.0);
+    }
 }
