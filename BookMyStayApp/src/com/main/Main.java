@@ -1,26 +1,34 @@
 package com.main;
-
-import com.reservation.ReservationRequest;
-import com.services.BookingQueueService;
+import com.services.*;
+import com.reservation.*;
 
 //Actor: Guest (represented via the main method)
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("=== BookMyStay App: Use Case 3 ===");
-        
-        BookingQueueService queueService = new BookingQueueService();
+public class Main {    
+	public static void main(String[] args) {
+		System.out.println("=== BookMyStay App: Use Case 4 ===");
 
-        System.out.println("\n[Simulating High Traffic: Multiple Guests Requesting Rooms Simultaneously]");
-        
-        // Simulating guests submitting requests [cite: 108]
-        queueService.enqueueRequest(new ReservationRequest("Alice", "Suite"));
-        queueService.enqueueRequest(new ReservationRequest("Bob", "Single"));
-        queueService.enqueueRequest(new ReservationRequest("Charlie", "Double"));
-        queueService.enqueueRequest(new ReservationRequest("Diana", "Suite"));
-        
-        System.out.println("\nCurrent Queue Size: " + queueService.getQueueSize() + " requests pending.");
+		// 1. Initialize Inventory (Only 2 Single rooms, 1 Suite available)
+		InventoryService inventory = new InventoryService();
+		inventory.addRoomType("Single", 2);
+		inventory.addRoomType("Suite", 1);
 
-      // Processing the queue to demonstrate predictable booking order [cite: 110]
-        queueService.processQueue();
-    }
+		inventory.displayInventory();
+
+		// 2. Initialize Booking Service
+		BookingService bookingService = new BookingService(inventory);
+
+		// 3. Guests make requests (We have 3 requests for 'Single', but only 2 exist!)
+		bookingService.enqueueRequest(new ReservationRequest("Alice", "Single"));
+		bookingService.enqueueRequest(new ReservationRequest("Bob", "Suite"));
+		bookingService.enqueueRequest(new ReservationRequest("Charlie", "Single"));
+		bookingService.enqueueRequest(new ReservationRequest("Diana", "Single")); // This one should fail due to atomic allocation
+
+		// 4. Process the Queue (Dequeue -> Assign -> Add to Set -> Decrement)
+		bookingService.processQueue();
+
+		// 5. Verify Strong booking integrity and Instant inventory sync
+		bookingService.displayAllocations();
+		inventory.displayInventory();
+	}
 }
+

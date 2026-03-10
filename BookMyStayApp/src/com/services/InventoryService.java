@@ -1,43 +1,37 @@
 package com.services;
-
 import java.util.HashMap;
 import java.util.Map;
 
 // Core Data Source (from UC1, extended for amenities)
 public class InventoryService {
-    private Map<String, Integer> roomCounts;
-    private Map<String, Double> roomPrices;
-    private Map<String, String> roomAmenities; // Added to satisfy "Show pricing and amenities"
+	private Map<String, Integer> roomCounts;
 
-    public InventoryService() {
-        this.roomCounts = new HashMap<>();
-        this.roomPrices = new HashMap<>();
-        this.roomAmenities = new HashMap<>();
-    }
+	public InventoryService() {
+		this.roomCounts = new HashMap<>();
+	}
 
-    // Admin function to setup inventory
-    public void setupRoom(String type, int count, double price, String amenities) {
-        roomCounts.put(type, count);
-        roomPrices.put(type, price);
-        roomAmenities.put(type, amenities);
-    }
+	public void addRoomType(String type, int initialCount) {
+		roomCounts.put(type, initialCount);
+	}
 
-    // --- Read-Only Access Methods for Search Service ---
-    
-    // Returns a defensive copy to prevent external mutation
-    public Map<String, Integer> getRoomCounts() {
-        return new HashMap<>(roomCounts); 
-    }
+	public int getAvailableCount(String type) {
+		return roomCounts.getOrDefault(type, 0);
+	}
 
-    public double getPrice(String type) {
-        return roomPrices.getOrDefault(type, 0.0);
-    }
+	// Key Requirement: Update availability immediately
+	public void decrementInventory(String type) {
+		int currentCount = getAvailableCount(type);
+		if (currentCount > 0) {
+			roomCounts.put(type, currentCount - 1);
+		}
+	}
 
-    public String getAmenities(String type) {
-        return roomAmenities.getOrDefault(type, "Standard Amenities");
-    }
-
-    public int getAvailableCount(String type) {
-        return roomCounts.getOrDefault(type, 0);
-    }
+	public void displayInventory() {
+		System.out.println("\n--- Real-Time Inventory Status ---");
+		for (Map.Entry<String, Integer> entry : roomCounts.entrySet()) {
+			System.out.printf("Type: %-8s | Available: %-2d%n", entry.getKey(), entry.getValue());
+		}
+		System.out.println("----------------------------------");
+	}
+	
 }
